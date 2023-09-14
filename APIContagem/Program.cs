@@ -35,6 +35,10 @@ builder.Services.AddOpenTelemetry().WithTracing(traceProvider =>
         .AddConsoleExporter();
 });
 
+if (int.TryParse(builder.Configuration["ApacheKafka:WaitingTimeInitialization"],
+        out int waitingTimeInitialization) && waitingTimeInitialization > 0)
+    await Task.Delay(waitingTimeInitialization);
+
 KafkaExtensions.CheckNumPartitions(builder.Configuration);
 
 var app = builder.Build();
