@@ -35,15 +35,6 @@ builder.Services.AddOpenTelemetry().WithTracing(traceProvider =>
         .AddConsoleExporter();
 });
 
-if (int.TryParse(builder.Configuration["ApacheKafka:WaitingTimeInitialization"],
-        out int waitingTimeInitialization) && waitingTimeInitialization > 0)
-{
-    Console.WriteLine($"Aguardando {waitingTimeInitialization} milissegundos para iniciar a aplicacao...");
-    await Task.Delay(waitingTimeInitialization);
-}
-
-KafkaExtensions.CheckNumPartitions(builder.Configuration);
-
 var app = builder.Build();
 
 app.UseSwagger();
@@ -54,5 +45,17 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (int.TryParse(builder.Configuration["ApacheKafka:WaitingTimeInitialization"],
+        out int waitingTimeInitialization) && waitingTimeInitialization > 0)
+{
+    // Tempo a ser aguardado para garantir que a instância do Kafka esteja disponível
+    // em testes com containers
+    app.Logger.LogInformation(
+        $"Aguardando {waitingTimeInitialization} milissegundos para iniciar a aplicacao...");
+    await Task.Delay(waitingTimeInitialization);
+}
+// Força a comunicação com o Apache Kafka para criar o tópico
+KafkaExtensions.CheckNumPartitions(builder.Configuration);
 
 app.Run();
