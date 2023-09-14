@@ -46,7 +46,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-if (int.TryParse(builder.Configuration["ApacheKafka:WaitingTimeInitialization"],
+if (int.TryParse(app.Configuration["ApacheKafka:WaitingTimeInitialization"],
         out int waitingTimeInitialization) && waitingTimeInitialization > 0)
 {
     // Tempo a ser aguardado para garantir que a instância do Kafka esteja disponível
@@ -56,6 +56,8 @@ if (int.TryParse(builder.Configuration["ApacheKafka:WaitingTimeInitialization"],
     await Task.Delay(waitingTimeInitialization);
 }
 // Força a comunicação com o Apache Kafka para criar o tópico
+app.Logger.LogInformation(
+    $"Verificando a necessida de criacao do topico {app.Configuration["ApacheKafka:Topic"]}...");
 KafkaExtensions.CheckNumPartitions(builder.Configuration);
 
 app.Run();
