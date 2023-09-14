@@ -21,7 +21,7 @@ public class Contador
         _partition = KafkaExtensions.QtdPartitions > 1 ? -1 : 0;
     }
 
-    private int _valorAtual = 89_999;
+    private int _valorAtual = 90_000;
     private int _partition;
 
     public int ValorAtual { get => _valorAtual; }
